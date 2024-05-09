@@ -37,11 +37,8 @@ class _LogInState extends State<LogIn> {
       if (!mounted) return;  // Check here as well before showing the SnackBar
       String errorMessage;
       switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No user found for that email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Wrong password provided for that user.';
+        case 'invalid-credential':
+          errorMessage = 'Wrong email or password provided.';
           break;
         case 'user-disabled':
           errorMessage = 'The user account has been disabled by an administrator.';
