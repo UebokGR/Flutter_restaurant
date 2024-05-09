@@ -1,9 +1,26 @@
 
 import "package:flutter/material.dart";
-
-
 import "../widget/widget_support.dart";
 import "food_details.dart";
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+Future<String> fetchUserName() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    return userData['name']; // Assuming 'name' is the field that stores user names.
+  }
+  return 'No Name'; // Default or error value
+}
+/* Future<String> fetchUserName() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    return userData['name']; // Assuming 'name' is the field that stores user names.
+  }
+  return 'No Name'; // Default or error value*/
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -26,10 +43,22 @@ class _HomeState extends State<Home> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Hello Fardeen!",
-                style: AppWidget.boldTextFieldStyle(),
+              Expanded(
+                child:FutureBuilder<String>(
+                  future: fetchUserName(), // This calls the fetchUserName function
+                  builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                   if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Text("Loading...", style: AppWidget.boldTextFieldStyle());
+                   } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}", style: AppWidget.boldTextFieldStyle());
+                    } else {
+                     return Text("Hello ${snapshot.data}!",
+                       style: AppWidget.boldTextFieldStyle(),
+                    );
+                  }
+                },
               ),
-
+              ),
               ///Here is the Shopping Cart Icon
               Container(
                 margin: const EdgeInsets.only(right: 20.0),
@@ -41,18 +70,18 @@ class _HomeState extends State<Home> {
               )
             ],
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           Text("MANJU",
             style: AppWidget.headLineTextFieldStyle(),
           ),
           Text("Delicious food for you to enjoy",
             style: AppWidget.lightTextFieldStyle(),
           ),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
          Container(
-           margin: EdgeInsets.only(right: 20.0),
+           margin: const EdgeInsets.only(right: 20.0),
              child: showItems()),
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
 
      SingleChildScrollView(
        scrollDirection: Axis.horizontal,
@@ -60,15 +89,15 @@ class _HomeState extends State<Home> {
               GestureDetector(
                 onTap: (){
                   Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                      FoodDetails()));
+                      const FoodDetails()));
                 },
                 child: Container(
-                  margin: EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(5),
                   child: Material(
                     elevation: 5.0,
                     borderRadius: BorderRadius.circular(10.0),
                     child: Container(
-                      padding: EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:[
@@ -78,7 +107,7 @@ class _HomeState extends State<Home> {
                               fit: BoxFit.cover),
                               Text("Mediteranean Salad",
                                 style: AppWidget.semiBoldTextFieldStyle(),),
-                              SizedBox(height: 5.0),
+                              const SizedBox(height: 5.0),
                               Text("\$8.50",
                                 style: AppWidget.semiBoldTextFieldStyle(),)
                         ],
@@ -87,14 +116,14 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-              SizedBox(width: 10.0),
+              const SizedBox(width: 10.0),
 
               Material(
                 elevation: 5.0,
                 borderRadius: BorderRadius.circular(10.0),
                 child: Container(
 
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:[
@@ -106,20 +135,20 @@ class _HomeState extends State<Home> {
                             fit: BoxFit.cover),
                         Text("Salad Bowl",
                           style: AppWidget.semiBoldTextFieldStyle(),),
-                        SizedBox(height: 5.0),
+                        const SizedBox(height: 5.0),
                         Text("\$8.50",
                           style: AppWidget.semiBoldTextFieldStyle(),)
                       ],
                     )
                 ),
               ),
-              SizedBox(width: 10.0),
+              const SizedBox(width: 10.0),
 
               Material(
                 elevation: 5.0,
                 borderRadius: BorderRadius.circular(10.0),
                 child: Container(
-                    padding: EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:[
@@ -129,7 +158,7 @@ class _HomeState extends State<Home> {
                             fit: BoxFit.cover),
                         Text("Salad Bowl",
                           style: AppWidget.semiBoldTextFieldStyle(),),
-                        SizedBox(height: 5.0),
+                        const SizedBox(height: 5.0),
                         Text("\$8.50",
                           style: AppWidget.semiBoldTextFieldStyle(),)
                       ],
@@ -140,16 +169,16 @@ class _HomeState extends State<Home> {
             ],),
           ),
 
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
 
           //Here starts the list menu
           Container(
-            margin: EdgeInsets.only(right: 20.0),
+            margin: const EdgeInsets.only(right: 20.0),
             child: Material(
               elevation: 5.0,
               borderRadius: BorderRadius.circular(20.0),
               child: Container(
-                padding: EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -157,18 +186,18 @@ class _HomeState extends State<Home> {
                         height:90,
                         width:90,
                         fit: BoxFit.cover),
-                    SizedBox(width: 20.0),
+                    const SizedBox(width: 20.0),
                     Column(
                       children:[
-                        SizedBox(height: 5.0),
-                        Container(
+                        const SizedBox(height: 5.0),
+                        SizedBox(
                           width: MediaQuery.of(context).size.width/2,
                           //handles the text overflow by wrapping the text
                           child: Text("Mediterranean Salad with feta cheese",
                             style: AppWidget.semiBoldTextFieldStyle(),),
                         ),
-                        SizedBox(height: 5.0),
-                        Container(
+                        const SizedBox(height: 5.0),
+                        SizedBox(
                           width: MediaQuery.of(context).size.width/2,
                           //handles the text overflow by wrapping the text
                           child: Text("\$8.50",
@@ -222,7 +251,7 @@ class _HomeState extends State<Home> {
                     color: appetizer ? Colors.white : Colors.blue,
                     borderRadius: BorderRadius.circular(10.0)
                 ),
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 child: Image.asset("images/Salad.jpg", height: 70, width: 70,
                   fit: BoxFit.cover,
 
@@ -248,7 +277,7 @@ class _HomeState extends State<Home> {
                     color: appetizer ? Colors.white : Colors.blue,
                     borderRadius: BorderRadius.circular(10.0)
                 ),
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 child: Image.asset("images/main.jpg", height: 70, width: 70,
                   fit: BoxFit.cover,
 
@@ -276,7 +305,7 @@ class _HomeState extends State<Home> {
                     color: appetizer ? Colors.white : Colors.blue,
                     borderRadius: BorderRadius.circular(10.0)
                 ),
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 child: Image.asset("images/dessert.jpg", height: 70, width: 70,
                   fit: BoxFit.cover,
 
@@ -303,7 +332,7 @@ class _HomeState extends State<Home> {
                     color: appetizer ? Colors.white : Colors.blue,
                     borderRadius: BorderRadius.circular(10.0)
                 ),
-                padding: EdgeInsets.all(2),
+                padding: const EdgeInsets.all(2),
                 child: Image.asset("images/soda.jpg", height: 70, width: 70,
                   fit: BoxFit.cover,
 

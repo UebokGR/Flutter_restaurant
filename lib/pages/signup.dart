@@ -3,9 +3,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:manju_restaurant/pages/bottomnav.dart';
 
 import '../widget/widget_support.dart';
@@ -30,46 +28,44 @@ TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
 registration() async {
-  if (password != null){
-    try{
-      UserCredential userCredential = await FirebaseAuth.instance.
-      createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-      );
+  try{
+    UserCredential userCredential = await FirebaseAuth.instance.
+    createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+    );
+    String uid = userCredential.user!.uid; // Get the UID of the newly created user
+    addDetails(uid,nameController.text.trim(), emailController.text.trim());
 
-      addDetails(nameController.text.trim(), emailController.text.trim());
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      backgroundColor: Colors.green,
+      content: Text("Registration Successful",
+      style: TextStyle(fontSize: 20)),
+    ));
 
+    //using pushReplacement to remove the back button, the user can't go back to the signup page
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BottomNav()));
+  } on FirebaseException catch (e){
+    if (e.code == 'weak-password'){
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Colors.green,
-        content: Text("Registration Successful",
+        backgroundColor: Colors.red,
+        content: Text("The password provided is too weak",
         style: TextStyle(fontSize: 20)),
       ));
-
-      //using pushReplacement to remove the back button, the user can't go back to the signup page
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BottomNav()));
-    } on FirebaseException catch (e){
-      if (e.code == 'weak-password'){
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("The password provided is too weak",
-          style: TextStyle(fontSize: 20)),
-        ));
-      } else if (e.code == 'email-already-in-use'){
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("The account already exists for that email",
-          style: TextStyle(fontSize: 20)),
-        ));
-      }
-    } catch (e){
-      print(e);
+    } else if (e.code == 'email-already-in-use'){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("The account already exists for that email",
+        style: TextStyle(fontSize: 20)),
+      ));
     }
+  } catch (e){
+    print(e);
   }
 }
 
-Future addDetails(String name, String email) async{
-    await FirebaseFirestore.instance.collection('users').add(
+Future addDetails(String uid, String name, String email) async{
+    await FirebaseFirestore.instance.collection('users').doc(uid).set(
       {
         'name': name,
         'email': email,
@@ -108,7 +104,7 @@ Future addDetails(String name, String email) async{
                     decoration: BoxDecoration(gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Colors.blue, Colors.green])),
+                        colors: const [Colors.blue, Colors.green])),
                   ),
                   Container(
                     /*
@@ -252,7 +248,7 @@ Future addDetails(String name, String email) async{
                                           decoration:  BoxDecoration(gradient: LinearGradient(
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
-                                            colors: [Colors.blue, Colors.green],
+                                            colors: const [Colors.blue, Colors.green],
                                       
                                           ),
                                               borderRadius: BorderRadius.circular(30)),
