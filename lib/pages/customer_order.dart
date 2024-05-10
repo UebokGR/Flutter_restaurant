@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import "../widget/widget_support.dart";
 import "food_details.dart";
-
+import "cart_details.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 class CustomerOrder extends StatefulWidget {
   const CustomerOrder({super.key});
 
@@ -54,10 +55,11 @@ class _CustomerOrderState extends State<CustomerOrder> {
     );
   }
 
+
   Widget buildCard(String title, String imagePath, String price) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const FoodDetails())); //should be changed to order details function eventually
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const CartDetails())); //should be changed to order details function eventually
       },
       child: Container(
         width: double.infinity,
