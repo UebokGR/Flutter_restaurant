@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:manju_restaurant/pages/customer_order.dart';
 import '../widget/widget_support.dart';
 import "food_details.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,6 +30,7 @@ class _CartDetailsState extends State<CartDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
     body: SafeArea(  // Ensures nothing goes under system status or navigation bars
       child: SingleChildScrollView(  // Allows vertical scrolling
         physics: const ClampingScrollPhysics(),
@@ -38,14 +40,27 @@ class _CartDetailsState extends State<CartDetails> {
             const SizedBox(height: 20.0),
             Padding(
               padding: const EdgeInsets.only(left: 20.0),  // Added padding to match the original design
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Restaurant Name",
+                    "Manju",
                     style: AppWidget.headLineTextFieldStyle().copyWith(fontSize: 45),
                   ),
-                  const SizedBox(height: 20.0),  // Space before the cards start
+              Container(
+                padding: const EdgeInsets.only(right: 20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerOrder()));  // Assumes OrdersPage exists
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, backgroundColor: Colors.blue, // Text color
+                      elevation: 5
+
+                    ),
+                    child: const Text('Orders'),
+                  ),
+              )
                 ],
               ),
             ),
@@ -54,11 +69,40 @@ class _CartDetailsState extends State<CartDetails> {
             buildCard("Soda", "images/soda.jpg", "\$8.50",3),
             const SizedBox(height: 10.0),
             buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
+            const SizedBox(height: 10.0),
+            buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
+            const SizedBox(height: 10.0),
+            buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
             const SizedBox(height: 50.0),  // Extra space at the bottom
+        Padding(
+          padding: const EdgeInsets.only(bottom: 80), // Adjust the padding to make room for the navigation bar
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const FoodDetails()));
+            },
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            child: const Text('Proceed to Checkout'),
+          ),
+        ),
           ],
         ),
+
       ),
     ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20),  // Adjust the position slightly above the bottom navigation bar
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const FoodDetails()));
+          },
+          icon: const Icon(Icons.shopping_cart),
+          label: const Text('Go to checkout', style: TextStyle(fontSize: 16)),  // Adjust font size as necessary
+          backgroundColor: Colors.blue,
+        ),
+      ),
     );
   }
 
