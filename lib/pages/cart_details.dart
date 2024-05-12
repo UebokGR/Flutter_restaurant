@@ -13,14 +13,15 @@ class CartDetails extends StatefulWidget {
 
 class _CartDetailsState extends State<CartDetails> {
   int aNumber = 1;
-  Future<void> _updateCartAmount(int newAmount) async {
-    String userId = FirebaseAuth.instance.currentUser!.uid;  // Ensure the user is logged in
-    String cartId = "HgqqLg8rdgmonMkQpYEk";  // You need to define how you get this ID
+  double subtotal = 0.0;  // Subtotal of the cart items
+  String userId = FirebaseAuth.instance.currentUser!.uid;  // Ensure the user is logged in
+  Future<void> _updateCartAmount(int newAmount,String itemName) async {
+    String cartId = itemName ;  // You need to define how you get this ID
 
     try {
       await FirebaseFirestore.instance
-          .doc('users/$userId/Carts/$cartId')
-          .update({'Salad Bowl': newAmount});
+          .doc('users/$userId/Cart/$cartId')
+          .update({'quantity': newAmount});
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating cart amount: $e'),backgroundColor: Colors.red));
@@ -64,16 +65,50 @@ class _CartDetailsState extends State<CartDetails> {
                 ],
               ),
             ),
-            buildCard("Salad Bowl", "images/Salad.jpg", "\$8.50",1),
-            const SizedBox(height: 10.0),
-            buildCard("Soda", "images/soda.jpg", "\$8.50",3),
-            const SizedBox(height: 10.0),
-            buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
-            const SizedBox(height: 10.0),
-            buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
-            const SizedBox(height: 10.0),
-            buildCard("Cake", "images/dessert.jpg", "\$8.50",2),
+            StreamBuilder<QuerySnapshot> (
+                stream: FirebaseFirestore.instance.collection('users').doc(userId).collection('Cart').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (!snapshot.hasData) {
+                    return const Text("No items in cart");
+                  }
+
+                  double newSubtotal = 0.0; // Temporary variable to calculate subtotal
+                  List<Widget> itemList = snapshot.data!.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                    double price = double.parse(data['price'].toString());
+                    int quantity = data['quantity'];
+                    newSubtotal += price * quantity;  // Add to the subtotal for each item
+                    return buildCard(data['name'], data['imageUrl'], "\$${price.toStringAsFixed(2)}", quantity);
+                  }).toList();
+                  // Update the state of subtotal after building the list
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (newSubtotal != subtotal) {
+                      setState(() {
+                        subtotal = newSubtotal;
+                      });
+                    }
+                  });
+
+                  return Column(children: itemList);
+                },
+
+            ),
             const SizedBox(height: 50.0),  // Extra space at the bottom
+            // Subtotal Row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Subtotal", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("\$${subtotal.toStringAsFixed(2)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+
         Padding(
           padding: const EdgeInsets.only(bottom: 80), // Adjust the padding to make room for the navigation bar
           child: ElevatedButton(
@@ -122,7 +157,7 @@ class _CartDetailsState extends State<CartDetails> {
             padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
-                Image.asset(
+                Image.network(
                   imagePath,
                   height: 150,
                   width: 150,
@@ -152,7 +187,7 @@ class _CartDetailsState extends State<CartDetails> {
                    setState(() {
                     amount = newAmount;
                     });
-                   _updateCartAmount(newAmount);
+                   _updateCartAmount(newAmount, title);
                   }),
               ],
             ),

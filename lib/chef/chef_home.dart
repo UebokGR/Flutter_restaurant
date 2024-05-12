@@ -13,11 +13,11 @@ class _ChefHomeState extends State<ChefHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.menu),
+        leading: const Icon(Icons.menu),
         backgroundColor: Colors.redAccent,
         title: Text("Chef Home", style: AppWidget.boldTextFieldStyle(),),
         centerTitle: true,
-        actions: [
+        actions: const [
           Icon(Icons.logout_sharp, color: Colors.black, size: 30),
           SizedBox(width: 20),]
       ),

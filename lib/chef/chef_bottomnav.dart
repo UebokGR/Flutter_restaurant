@@ -44,7 +44,7 @@ class _ChefNavState extends State<ChefNav> {
           setState(() {
             currentTabIndex = index;});
         },
-        items: [
+        items: const [
           Icon(Icons.home_outlined, color: Colors.white,),
           Icon(Icons.add_circle_outline, color: Colors.white,),
           Icon(Icons.person_outline, color: Colors.white,),

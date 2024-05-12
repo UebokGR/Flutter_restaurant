@@ -49,7 +49,7 @@ class _LogInState extends State<LogIn> {
         default:
           errorMessage = 'An unexpected error occurred. Please try again.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage),backgroundColor: Colors.red));
     }
   }
 

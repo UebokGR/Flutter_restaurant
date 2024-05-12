@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart%20';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:manju_restaurant/pages/home.dart';
 import '../widget/widget_support.dart';
 
 
@@ -17,7 +18,7 @@ class FoodDetails extends StatefulWidget {
 class _FoodDetailsState extends State<FoodDetails> {
   int aNumber = 1;
   late Future<DocumentSnapshot<Map<String, dynamic>>> foodItem;
-  String foodId = 'TBYUpy6UGq44qTOFWAqy';  // Ensure this ID is correct
+  String foodId = 'eLpTKmM822QJgAENY81Y';  // Ensure this ID is correct
 
   @override
   void initState() {
@@ -28,6 +29,21 @@ class _FoodDetailsState extends State<FoodDetails> {
   Future<DocumentSnapshot<Map<String, dynamic>>> fetchFoodItem() async {
     return FirebaseFirestore.instance.collection('Menu').doc(foodId).get();
   }
+  Future<void> addCartItem(Map<String, dynamic> item) async {
+    String userId = FirebaseAuth.instance.currentUser!.uid; // Ensure the user is logged in
+
+    CollectionReference cart = FirebaseFirestore.instance.collection('users').doc(userId).collection('Cart');
+
+    return cart.doc(item['itemName']).set({
+      'name': item['itemName'],
+      'imageUrl': item['imageUrl'],
+      'price': item['price'],
+      'quantity': aNumber,  // Default quantity
+    })
+        .then((value) => print("Item Added"))
+        .catchError((error) => print("Failed to add item: $error"));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +55,10 @@ class _FoodDetailsState extends State<FoodDetails> {
             return const CircularProgressIndicator();
           }
 
-          if (!snapshot.hasData || snapshot.data?.data() == null) {
-            return const Text("No data found");
-          }
           // Safely access itemData using null checks or fallback values
           Map<String, dynamic> itemData = snapshot.data!.data() ?? {};
           if (itemData.isEmpty) {
-            return const Text("No data found");
+            return const Text("No data found7");
           }
           return buildContent(context, itemData);
         },
@@ -58,6 +71,7 @@ class _FoodDetailsState extends State<FoodDetails> {
     String imageUrl = itemData['imageUrl'] as String? ?? 'default_image_path.jpg';
     String itemName = itemData['itemName'] as String? ?? 'No Name';
     double rating = (itemData['rating'] as num?)?.toDouble() ?? 0.0;
+    double price = (itemData['price'] as num?)?.toDouble() ?? 0.0;
 
     return Container(
             margin: const EdgeInsets.only(top: 30, left: 10, right: 20),
@@ -73,7 +87,7 @@ class _FoodDetailsState extends State<FoodDetails> {
                         Icon(Icons.arrow_back_ios_new_outlined,
                             color: Colors.black)
                       ])),
-                  Image.network(imageUrl, //NEEDS TO BE DYNAMIC
+                  Image.network(imageUrl,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -186,12 +200,18 @@ class _FoodDetailsState extends State<FoodDetails> {
                               children: [
                                 Text("Total Price:",
                                     style: AppWidget.boldTextFieldStyle()),
-                                Text(itemData['price'], style: AppWidget
+                                Text( " ${price.toStringAsFixed(2)}", style: AppWidget
                                     .headLineTextFieldStyle())
 
                               ]
                           ),
-                          Container(
+                          GestureDetector(
+                            onTap: () {
+
+                              Navigator.pop(context);
+                              addCartItem(itemData);
+                            },
+                          child: Container(
                               width: MediaQuery
                                   .of(context)
                                   .size
@@ -222,12 +242,14 @@ class _FoodDetailsState extends State<FoodDetails> {
                                   )
                                 ],
                               )
+                          ),
                           )
                         ]
                     ),
                   )
                 ]),
           );
+
         }
   }
 

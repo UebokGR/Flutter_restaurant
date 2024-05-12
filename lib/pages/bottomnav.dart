@@ -1,10 +1,10 @@
 
 
 import "package:flutter/material.dart";
+import "package:manju_restaurant/pages/cart_details.dart";
 import "package:manju_restaurant/pages/profile.dart";
 import "package:manju_restaurant/pages/wallet.dart";
 import "package:curved_navigation_bar/curved_navigation_bar.dart";
-
 
 import "customer_order.dart";
 import "home.dart";
@@ -23,18 +23,18 @@ class _BottomNavState extends State<BottomNav> {
   late Widget currentPage;
   late Home homepage;
   late Wallet wallet;
-  late CustomerOrder customerOrder;
+  late CartDetails cartDetails;
   late Profile profile;
 
   @override
   void initState() {
     // TODO: implement initState
-    homepage =  Home();
-    wallet =  Wallet();
-    customerOrder =  CustomerOrder();
-    profile =  Profile();
+    homepage =  const Home();
+    wallet =  const Wallet();
+    cartDetails =  const CartDetails();
+    profile =  const Profile();
 
-    pages = [homepage, customerOrder, wallet, profile];
+    pages = [homepage, cartDetails, wallet, profile];
     super.initState();
   }
   @override
@@ -44,12 +44,12 @@ class _BottomNavState extends State<BottomNav> {
         height: 65,
         backgroundColor: Colors.white,
         color: Colors.black,
-        animationDuration: Duration(milliseconds: 200),
+        animationDuration: const Duration(milliseconds: 200),
         onTap: (int index){
           setState(() {
             currentTabIndex = index;});
         },
-        items: [
+        items: const [
           Icon(Icons.home_outlined, color: Colors.white,),
           Icon(Icons.shopping_bag_outlined, color: Colors.white,),
           Icon(Icons.wallet_outlined, color: Colors.white,),
